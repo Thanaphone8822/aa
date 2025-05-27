@@ -6,16 +6,26 @@ import P_mainView from './views/P_mainView.vue';
 import Licence_card from './components/Licence_card.vue';
 import Payment from './components/Payment.vue';
 import Confirm from './components/Confirm.vue';
+import jj from './components/Rules.vue';
+import test from './components/test.vue'; 
+import { log } from 'console';
+import LoginView from './components/LoginView.vue';
+import P_login from './components/P_login.vue';
+
 
 </script>
 
 <template>
   <!-- <Payment/> -->
-  <Licence_card/>
+  <!-- <Licence_card/> -->
   <!-- <P_mainView /> -->
   <!-- <Licence_card/> -->
-  <!-- <MainView/> -->
-   <!-- <Confirm/> -->
+  <MainView />
+  <!-- <test /> -->
+  <!-- <Confirm/> -->
+  <!-- <jj/> -->
+  <!-- <LoginView /> -->
+  <!-- <P_login /> -->
 </template>
 
 <style scoped>

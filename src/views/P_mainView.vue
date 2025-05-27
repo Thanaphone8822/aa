@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Licence_card from '@/components/Licence_card.vue'
-import Table from '@/components/Table.vue'
+// import Table from '@/components/Table.vue'
 import { ref } from 'vue'
 const activeComponent = ref('') // Default to an empty string
 

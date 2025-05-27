@@ -7,6 +7,8 @@ import PoliceVeiw from '@/views/PoliceVeiw.vue'
 import P_mainView from '@/views/P_mainView.vue'
 import Licence_card from '../components/Licence_card.vue'
 import Payment from '../components/Payment.vue'
+import Table from '@/components/Table.vue'
+import p_login from '@/components/p_login.vue'
 
 
 const router = createRouter({
@@ -44,7 +46,7 @@ const router = createRouter({
       name: 'home',
       component: HomeView,
     },
-    
+
     {
       path: '/about',
       name: 'about',
@@ -52,6 +54,7 @@ const router = createRouter({
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue'),
+      
     },
     {
       path: '/pmain',
@@ -89,7 +92,7 @@ const router = createRouter({
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component:Licence_card,
+      component: Licence_card,
     },
     {
       path: '/payment',
@@ -103,8 +106,30 @@ const router = createRouter({
       path: '/confirm',
       name: 'confirm',
       component: () => import('../components/Confirm.vue'),
-    }
+    },
+    {
+      path: '/main/rule',
+      name: 'rule',
+      component: () => import('../components/Rules.vue'),
+    },
+    {
+      path: '/table',
+      name: 'table',
+      component: () => import('../components/table.vue'),
+    },
+    {
+      path: '/rulesdt/:id',
+      name: 'rulesdt',
+      component: () => import('../components/RulesDt.vue'),
+      
+    },
     
+    {
+      path: '/plogin',
+      name: 'plogin',
+      component: () => import('@/components/P_login.vue'),
+    },
+
   ],
 })
 
