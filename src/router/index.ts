@@ -1,20 +1,21 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../components/HomeView.vue'
 import LoginView from '@/components/LoginView.vue'
 import AdminView from '../views/AdminView.vue'
 import UserView from '../views/UserView.vue'
-import PoliceVeiw from '@/views/PoliceVeiw.vue'
-import P_mainView from '@/views/P_mainView.vue'
-import Licence_card from '../components/Licence_card.vue'
-import Payment from '../components/Payment.vue'
+import PoliceVeiw from '../views/PoliceVeiw.vue'
+import P_mainView from '../views/P_mainView.vue'
+import Licence_card from '@/components/Licence_card.vue'
+import Payment from '@/components/Payment.vue'
 import Table from '@/components/Table.vue'
 import p_login from '@/components/p_login.vue'
+import Ruledt from '@/components/RulesDt.vue';
+import History from '@/components/History.vue';
+import p_card from '@/components/P_card.vue';
 
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-
     {
       path: '/admin',
       component: AdminView,
@@ -31,37 +32,66 @@ const router = createRouter({
       component: PoliceVeiw,
       meta: { requiresRole: 'police' },
     },
-
-
+    {
+      path: '/',
+      redirect: '/login'
+    },
     {
       path: '/login',
-      name: 'Login',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
+      name: 'login',
       component: LoginView,
     },
     {
-      path: '/',
-      name: 'home',
-      component: HomeView,
-    },
+      path: '/main',
+      name: 'main',
+      component: () => import('../views/MainView.vue'),
+      children: [
+        {
+          path: 'new',
+          name: 'new',
+          component: () => import('../components/New.vue'),
+        },
+        {
+          path: 'rule',
+          name: 'rule',
+          component: () => import('../components/Rules.vue'),
+        },
+        {
+          path: 'history',
+          name: 'history',
+          component: () => import('../components/History.vue'),
+        },
+        {
+          path: 'license',
+          name: 'license',
+          component: () => import('../components/Licence_card.vue'),
+        },
 
+        // Add more as needed
+      ]
+    },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
-      
+      path: '/rules',
+      name: 'rules',
+      component: () => import('../components/Rules.vue'),
     },
     {
       path: '/pmain',
       name: 'pmain',
       component: P_mainView,
+      children: [
+        {
+          path: 'card',
+          name: 'card',
+          component: p_card,
+        },// Add more as needed
+      ]
     },
-
+    // {
+    //   path: '/p_Card',
+    //   name: 'pcard',
+    //   component: p_card,
+    // },
     {
       path: '/register',
       name: 'register',
@@ -71,59 +101,21 @@ const router = createRouter({
       component: () => import('../views/RegisterView.vue'),
     },
     {
-      path: '/user/main',
-      name: 'main',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/MainView.vue'),
-    },
-    {
-      path: '/new',
-      name: 'new',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../components/New.vue'),
-    },
-    {
-      path: '/license',
-      name: 'license',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: Licence_card,
-    },
-    {
-      path: '/payment',
-      name: 'payment',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../components/Payment.vue'),
-    },
-    {
       path: '/confirm',
       name: 'confirm',
       component: () => import('../components/Confirm.vue'),
     },
     {
-      path: '/main/rule',
-      name: 'rule',
-      component: () => import('../components/Rules.vue'),
-    },
-    {
       path: '/table',
       name: 'table',
-      component: () => import('../components/table.vue'),
+      component: () => import('../components/Table.vue'),
     },
     {
       path: '/rulesdt/:id',
       name: 'rulesdt',
       component: () => import('../components/RulesDt.vue'),
-      
+
     },
-    
     {
       path: '/plogin',
       name: 'plogin',

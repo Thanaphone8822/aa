@@ -25,6 +25,7 @@ onMounted(async () => {
     } catch (error) {
         errorMessage.value = error.message; // Handle errors
     }
+    
 });
 </script>
 
@@ -43,7 +44,6 @@ onMounted(async () => {
                         <td class="text-lg">ສະຖານທີ່</td>
                         <!-- <td class="text-lg">ເລກຖັງ</td> -->
                         <!-- <td class="text-lg">ປະເພດລົດ</td> -->
-
                     </tr>
                 </thead>
                 <tbody>
@@ -52,7 +52,7 @@ onMounted(async () => {
                         class="hover:bg-base-200 transition-colors duration-200 hover:rounded-lg cursor-pointer">
                         <th class="text-sm">{{ index + 1 }}</th>
                         <td class="text-base">{{ product.id }}</td>
-                        <td class="text-base">{{ product.rule_type }}</td>
+                        <td class="text-base">{{ product.rule_type}}</td>
                         <td class="text-base">{{ product.address }}</td>
                         <td class="text-base">{{ product.brith }}</td>
                         <td class="text-base">{{ product.create_at }}</td>

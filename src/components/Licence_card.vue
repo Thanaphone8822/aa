@@ -52,18 +52,20 @@ onMounted(async () => {
 
             <!-- Content Section -->
             <div v-for="(product, index) in products" class="flex items-center gap-2">
-                <div class="w-16 h-20 bg-gray-300 rounded overflow-hidden"></div>
+                <div class="w-16 h-20 bg-gray-300 rounded overflow-hidden">
+                    <img src="@/assets/11.jpg" alt="">
+                </div>
                 <div class="text-[11px] text-black space-y-1">
-                    <p>{{ product.lao_name }} <br />{{ product.dv_name }}</p>
-                    <p>ເກີດວັນທີ: {{ product.dv_birth }}<br />ສັນຊາດ: {{ product.nationality }}<br />ທີ່ຢູ່: {{ product.address }}</p>
+                    <p>{{ product.name }} {{ product.surname }}<br />{{ product.eng_name }} {{ product.eng_surname }}</p>
+                    <p>ເກີດວັນທີ: {{ product.birth }}<br />ສັນຊາດ: {{ product.national }}<br />ທີ່ຢູ່: {{ product.address }}</p>
                 </div>
             </div>
 
             <!-- Footer Section -->
             <div v-for="(product, index) in products" class="absolute bottom-2 left-4 text-[10px] text-black space-y-1">
-                <p>ອອກວັນທີ / Delivre / Issued:  {{ product.issued }}</p>
-                <p>ວັນໝົດອາຍ / Expiration / Expiry:  {{ product.expiry }}</p>
-                <p>ປະເພດ / Categorie / Category:  {{ product.category }}</p>
+                <p>ອອກວັນທີ / Delivre / Issued:  {{ product.DI }}</p>
+                <p>ວັນໝົດອາຍ / Expiration / Expiry:  {{ product.DE }}</p>
+                <p>ປະເພດ / Categorie / Category:  {{ product.c_category }}</p>
             </div>
         </div>
 

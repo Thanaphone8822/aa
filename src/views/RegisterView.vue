@@ -3,7 +3,7 @@ import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>
-  <div class="flex items-center justify-center">
+  <div class="flex items-center justify-center min-h-screen bg-gray-100">
     <div class="bg-white shadow-md rounded-lg p-6 w-full max-w-md">
       <h1 class="text-2xl font-bold text-center text-gray-800 mb-6 font-noto">ລົງທະບຽນ</h1>
       <form>

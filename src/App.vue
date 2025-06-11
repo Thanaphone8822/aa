@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import MainView from './views/MainView.vue';
-import UserView from './views/UserView.vue';
-import P_mainView from './views/P_mainView.vue';
-import Licence_card from './components/Licence_card.vue';
-import Payment from './components/Payment.vue';
-import Confirm from './components/Confirm.vue';
-import jj from './components/Rules.vue';
-import test from './components/test.vue'; 
-import { log } from 'console';
+// import MainView from './views/MainView.vue';
+// import UserView from './views/UserView.vue';
+// import P_mainView from './views/P_mainView.vue';
+// import Licence_card from './components/Licence_card.vue';
+// import Payment from './components/Payment.vue';
+// import Confirm from './components/Confirm.vue';
+// import Rules from './components/Rules.vue';
+// import test from './components/test.vue'; 
+// import { log } from 'console';
 import LoginView from './components/LoginView.vue';
-import P_login from './components/P_login.vue';
+// import P_login from './components/P_login.vue';
+// import Table from './components/Table.vue';
 
 
 </script>
@@ -20,12 +21,15 @@ import P_login from './components/P_login.vue';
   <!-- <Licence_card/> -->
   <!-- <P_mainView /> -->
   <!-- <Licence_card/> -->
-  <MainView />
+  <!-- <MainView /> -->
   <!-- <test /> -->
   <!-- <Confirm/> -->
-  <!-- <jj/> -->
+  <!-- <Rules /> -->
   <!-- <LoginView /> -->
   <!-- <P_login /> -->
+  <!-- <Table /> -->
+  
+  <router-view />
 </template>
 
 <style scoped>

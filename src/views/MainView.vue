@@ -1,20 +1,33 @@
 <script setup>
-import { ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import New from '@/components/New.vue';
-import AboutView from './AboutView.vue';
-import Table from '@/components/Table.vue';
-import Licence_card from '@/components/Licence_card.vue';
-import jj from '@/components/Rules.vue';
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
-// Get the current route and router instance
 const route = useRoute();
 const router = useRouter();
 
-// Function to navigate to a tab
+const showLogoutModal = ref(false);
+const userName = ref('Profile') // Default
+
 const navigateToTab = (tab) => {
-    router.push({ name: tab }); // Navigate to the route by name
+    router.push({ name: tab });
 };
+
+const logout = async () => {
+    await fetch('http://localhost:3000/api/logout', {
+        method: 'POST',
+        credentials: 'include',
+    });
+    router.push({ name: 'login' });
+};
+
+// Fetch user info on mount
+onMounted(async () => {
+    const res = await fetch('http://localhost:3000/api/user/profile', { credentials: 'include' });
+    const data = await res.json();
+    if (data.code === 10 && data.data) {
+        userName.value = data.data.name || data.data.username || 'ບໍ່ມີຂໍ້ມູນ';
+    }
+});
 </script>
 
 <template>
@@ -38,12 +51,12 @@ const navigateToTab = (tab) => {
                     class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow text-lg">
                     <li>
                         <a class="justify-between">
-                            Profile
+                            {{ userName }}
                             <span class="badge">New</span>
                         </a>
                     </li>
                     <li><a>Settings</a></li>
-                    <li><a>Logout</a></li>
+                    <li><a @click="showLogoutModal = true">Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -58,21 +71,33 @@ const navigateToTab = (tab) => {
             @click="navigateToTab('rule')">
             ກົດລະບຽບຈະລາຈອນ
         </a>
-        <a role="tab" class="tab text-xl" :class="{ 'tab-active': route.name === 'table' }"
-            @click="navigateToTab('table')">
+        <a role="tab" class="tab text-xl" :class="{ 'tab-active': route.name === 'history' }"
+            @click="navigateToTab('history')">
             ປະຫວັດການຖຶກປັບ
         </a>
         <a role="tab" class="tab text-xl" :class="{ 'tab-active': route.name === 'license' }"
             @click="navigateToTab('license')">
             ຂໍ້ມູນໃບຂັບຂີ່
         </a>
-        <a role="tab" class="tab text-xl" :class="{ 'tab-active': route.name === 'jj' }" @click="navigateToTab('jj')">
+        <a role="tab" class="tab text-xl" :class="{ 'tab-active': route.name === '#' }" @click="navigateToTab('#')">
             ໃບສັ່ງທີ່ໄດ້ຮັບ
         </a>
     </div>
 
     <!-- Dynamic Content Section -->
     <router-view />
+
+    <!-- Logout Modal -->
+    <div v-if="showLogoutModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+        <div class="bg-white rounded-lg shadow-lg p-8 w-80 text-center">
+            <h2 class="text-xl font-bold mb-4 text-black">Confirm Logout</h2>
+            <p class="mb-6 text-red-600">Are you sure you want to logout?</p>
+            <div class="flex justify-center gap-4">
+                <button @click="logout" class="btn btn-primary w-[70px]">Yes</button>
+                <button @click="showLogoutModal = false" class="btn btn-warnin w-[70px]">Cancel</button>
+            </div>
+        </div>
+    </div>
 </template>
 
 <style lang="scss" scoped></style>
