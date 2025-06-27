@@ -3,17 +3,14 @@ import { ref, computed } from 'vue'
 import trashicon from './icons/trashicon.vue'
 
 // Form data
-const vehicleTypes = ref<string[]>([])
+const vehicleType = ref<string>('')
 const violationTypes = ref<string[]>([])
 const articles = ref<string[]>([])
 
 // Summary form data
-const receiptCode = ref('')
-const paymentType = ref('')
-const paymentCodeDay = ref('')
-const paymentCodeMonth = ref('')
-const historyFee = ref('')
 const complaintDetails = ref('')
+const showSummarySection = ref(false)
+const summaryFinalized = ref(false)
 
 // Price mapping for each article
 const articlePrices: { [key: string]: number } = {
@@ -166,19 +163,20 @@ const formatPrice = (price: number) => {
 }
 
 const handleAddMore = () => {
+  showSummarySection.value = true
+  summaryFinalized.value = true
   console.log('Adding more items...')
 }
 
 const handleClear = () => {
-  vehicleTypes.value = []
+  vehicleType.value = ''
   violationTypes.value = []
-  articles.value = []
   console.log('Form cleared')
 }
 
 const handleApprove = () => {
   console.log('Approving fines...', {
-    vehicleTypes: vehicleTypes.value,
+    vehicleType: vehicleType.value,
     violationTypes: violationTypes.value,
     articles: articles.value,
     totalPrice: totalPrice.value,
@@ -195,6 +193,12 @@ const getCurrentDate = () => {
   return `${day}/${month}/${year}`
 }
 
+// Generate fines code starting with 0001
+const generateFinesCode = () => {
+  const timestamp = Date.now().toString().slice(-4)
+  return `${timestamp}`
+}
+
 const getViolationTypeForArticle = (article: string) => {
   for (const [violationType, articlesList] of Object.entries(articlesByViolationType)) {
     if (articlesList.includes(article)) {
@@ -204,10 +208,19 @@ const getViolationTypeForArticle = (article: string) => {
   return 'N/A'
 }
 
+const editArticle = (article: string) => {
+  console.log('Editing article:', article)
+  // Add edit functionality here if needed
+}
+
 const removeArticle = (articleToRemove: string) => {
   const index = articles.value.indexOf(articleToRemove)
   if (index > -1) {
     articles.value.splice(index, 1)
+    if (articles.value.length === 0) {
+      showSummarySection.value = false
+      summaryFinalized.value = false
+    }
   }
 }
 
@@ -215,11 +228,8 @@ const generateReceipt = () => {
   console.log('Generating receipt...', {
     articles: articles.value,
     totalPrice: totalPrice.value,
-    receiptCode: receiptCode.value,
-    paymentType: paymentType.value,
-    paymentCodeDay: paymentCodeDay.value,
-    paymentCodeMonth: paymentCodeMonth.value,
-    historyFee: historyFee.value,
+    finesCode: generateFinesCode(),
+    vehicleType: vehicleType.value,
     complaintDetails: complaintDetails.value
   })
 }
@@ -237,10 +247,11 @@ const generateReceipt = () => {
         <div class="bg-white p-4 rounded-lg space-y-3">
           <div v-for="option in vehicleOptions" :key="option" class="flex items-center">
             <input 
-              type="checkbox" 
+              type="radio" 
               :id="'vehicle-' + option"
               :value="option"
-              v-model="vehicleTypes"
+              v-model="vehicleType"
+              name="vehicleType"
               class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
             >
             <label :for="'vehicle-' + option" class="ml-3 text-sm text-gray-700 cursor-pointer">
@@ -374,7 +385,7 @@ const generateReceipt = () => {
           <thead class="bg-gray-50">
             <tr>
               <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ລຳດັບ</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ປະເພດເໝວດ</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ປະເພດໝວດ</th>
               <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ປະເພດມາດຕາ</th>
               <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ວັນເດືອນປີ</th>
               <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ລາຄາ</th>
@@ -382,12 +393,18 @@ const generateReceipt = () => {
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-if="articles.length === 0">
+            <tr v-if="!summaryFinalized">
+              <td colspan="6" class="px-4 py-8 text-center text-gray-500">
+                ກົດປຸ່ມ "ເພີ່ມຂໍ້ຫາ" ເພື່ອສະແດງລາຍການ<br>
+                (Click "ເພີ່ມຂໍ້ຫາ" button to show list)
+              </td>
+            </tr>
+            <tr v-else-if="summaryFinalized && articles.length === 0">
               <td colspan="6" class="px-4 py-8 text-center text-gray-500">
                 ບໍ່ມີຂໍ້ມູນທີ່ເລືອກ (No data selected)
               </td>
             </tr>
-            <tr v-else v-for="(article, index) in articles" :key="article" class="hover:bg-gray-50">
+            <tr v-else-if="summaryFinalized" v-for="(article, index) in articles" :key="article" class="hover:bg-gray-50">
               <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{{ index + 1 }}</td>
               <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                 {{ getViolationTypeForArticle(article) }}
@@ -402,12 +419,12 @@ const generateReceipt = () => {
                 {{ formatPrice(articlePrices[article] || 0) }}
               </td>
               <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
-                <button @click="removeArticle(article)" class="text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded mr-2">
-                  ແກ້ໄຂ
-                </button>
-                <button @click="removeArticle(article)" class="text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded">
-                  ລຶບ
-                </button>
+                 <button @click="editArticle(article)" class="text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded mr-2">
+                   ແກ້ໄຂ
+                 </button>
+                 <button @click="removeArticle(article)" class="text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded">
+                   ລຶບ
+                  </button>
               </td>
             </tr>
           </tbody>
@@ -421,7 +438,7 @@ const generateReceipt = () => {
       <div class="bg-white p-6 rounded-lg shadow-lg">
         <div class="space-y-4">
           <div class="flex justify-between items-center">
-            <span class="text-black">ຕົ້ນລວມ:</span>
+            <span class="text-black">ຈຳນວນຂໍ້ຫາ:</span>
             <span class="text-black font-semibold">{{ articles.length }} ລາຍການ</span>
           </div>
           
@@ -430,40 +447,16 @@ const generateReceipt = () => {
             <span class="font-bold text-lg text-blue-600">{{ formatPrice(totalPrice) }}</span>
           </div>
           
-          <div class="border-t pt-4">
-            <div class="flex justify-between items-center mb-3">
-              <span class="text-black">ລະຫັດໃບຊຳລະ:</span>
-              <input type="text" v-model="receiptCode" class="border rounded px-3 py-1 w-32" placeholder="XXXX">
-            </div>
-            
-            <div class="flex justify-between items-center mb-3">
-              <span class="text-black">ປະເພດການຊຳລະ:</span>
-              <select v-model="paymentType" class="border rounded px-3 py-1 w-32">
-                <option value="">ເລືອກ</option>
-                <option value="cash">ເງິນສົດ</option>
-                <option value="card">ບັດ</option>
-                <option value="transfer">ໂອນເງິນ</option>
-              </select>
-            </div>
-            
-            <div class="space-y-2">
-              <div class="flex justify-between items-center">
-                <span class="text-black">ລະຫັດການຊຳລະ:</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-sm text-black">ວັນ:</span>
-                <input type="text" v-model="paymentCodeDay" class="border rounded px-2 py-1 w-24" placeholder="XXXXXXX">
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-sm text-black">ເດືອນ:</span>
-                <input type="text" v-model="paymentCodeMonth" class="border rounded px-2 py-1 w-24" placeholder="XXXXXXX">
-              </div>
-            </div>
-            
-            <div class="flex justify-between items-center mt-3">
-              <span class="text-black">ຟີປະຫວັດ:</span>
-              <input type="text" v-model="historyFee" class="border rounded px-3 py-1 w-32" placeholder="XXXXXXX">
-            </div>
+          <div class="flex justify-between items-center">
+            <span class="text-black">ລະຫັດໃບປັບ:</span>
+            <span class="text-blue-600 font-semibold">{{ generateFinesCode() }}</span>
+          </div>
+          
+          <div class="flex justify-between items-center">
+            <span class="text-black">ປະເພດລົດ:</span>
+            <span class="text-black font-semibold">
+              {{ vehicleType || 'ບໍ່ໄດ້ເລືອກ' }}
+            </span>
           </div>
         </div>
       </div>
