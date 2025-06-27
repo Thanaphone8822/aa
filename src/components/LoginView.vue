@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import Table from '@/components/Table.vue' // Import the component to switch to
+import fineHistory from '@/components/fineHistory.vue' // Import the component to switch to
 
 const router = useRouter()
 const activeComponent = ref('login') // Default to 'login'
