@@ -6,6 +6,7 @@ import P_mainView from './views/P_mainView.vue';
 import Licence_card from './components/Licence_card.vue';
 import Payment from './components/Payment.vue';
 import Confirm from './components/Confirm.vue';
+import TabRightNoti from './views/TabRightNoti.vue';
 
 </script>
 

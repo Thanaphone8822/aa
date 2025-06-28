@@ -2,36 +2,58 @@
 import { ref } from "vue";
 
     const showDetailsPopup = ref(false);
+    const Hfines = ref([
+        {
+            id: 1,
+            receiptNumber: 'XXXXXX',
+            officer: 'XXXXXX',
+            offenses: 'XX',
+            vehicleType: 'XXXXXXXXXXXXXX',
+            time: '00:00',
+            date: '00/00/0000',
+            totalAmount: '00000000000'
+        },
+        {
+            id: 2,
+            receiptNumber: 'XXXXXX',
+            officer: 'XXXXXX',
+            offenses: 'XX',
+            vehicleType: 'XXXXXXXXXXXXXX',
+            time: '00:00',
+            date: '00/00/0000',
+            totalAmount: '00000000000'
+        }
+    ])
 </script>
 
 <template>
     <div class="p-4 rounded-lg">
         <div class="bg-white p-6 rounded-lg shadow-md">
-            <h1 class="text-2xl font-bold mb-4 font-lao text-gray-800 border-b pb-2">ໃບບິນທີ່ຊຳລະແລ້ວ</h1>
+            <h1 class="text-3xl font-bold mb-4 font-lao text-gray-800 border-b pb-2">ປະຫວັດການຖືກປັບ</h1>
             <div class="mt-4">
                 <table class="w-full border-separate" style="border-spacing: 0 0.5rem;">
                     <thead>
                         <tr class="font-bold text-gray-700 font-lao">
-                            <th class="p-3 text-left bg-yellow-300 rounded-l-lg">ເລກທີໃບສັ່ງ</th>
-                            <th class="p-3 text-left bg-yellow-300">ປັບໃໝໂດຍເຈົ້າໜ້າທີ່</th>
-                            <th class="p-3 text-left bg-yellow-300">ຈຳນວນຂໍ້ຫາ</th>
-                            <th class="p-3 text-left bg-yellow-300">ປະເພດພາຫະນະ</th>
-                            <th class="p-3 text-left bg-yellow-300">ເວລາ</th>
-                            <th class="p-3 text-left bg-yellow-300">ວັນເດືອນປີ</th>
-                            <th class="p-3 text-left bg-yellow-300">ເງິນລວມ</th>
-                            <th class="p-3 text-left bg-yellow-300 rounded-r-lg"></th>
+                            <th class="p-3 text-left bg-yellow-200 rounded-l-lg">ເລກທີໃບສັ່ງ</th>
+                            <th class="p-3 text-left bg-yellow-200">ປັບໃໝໂດຍເຈົ້າໜ້າທີ່</th>
+                            <th class="p-3 text-left bg-yellow-200">ຈຳນວນຂໍ້ຫາ</th>
+                            <th class="p-3 text-left bg-yellow-200">ປະເພດພາຫະນະ</th>
+                            <th class="p-3 text-left bg-yellow-200">ເວລາ</th>
+                            <th class="p-3 text-left bg-yellow-200">ວັນເດືອນປີ</th>
+                            <th class="p-3 text-left bg-yellow-200">ເງິນລວມ</th>
+                            <th class="p-3 text-left bg-yellow-200 rounded-r-lg"></th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr class="text-red-600 font-lao">
-                            <td class="p-3 bg-yellow-300 rounded-l-lg">00001</td>
-                            <td class="p-3 bg-yellow-300">XXXXXXXX</td>
-                            <td class="p-3 bg-yellow-300">XX</td>
-                            <td class="p-3 bg-yellow-300">XXXXX</td>
-                            <td class="p-3 bg-yellow-300">00:00</td>
-                            <td class="p-3 bg-yellow-300">XX/XX/XXXX</td>
-                            <td class="p-3 bg-yellow-300">XXXXXXXXXX ກີບ</td>
-                            <td class="p-3 bg-yellow-300 rounded-r-lg">
+                    <tbody class="overflow-y-scroll">
+                        <tr v-for="fine in Hfines" :key="fine.id"  class="text-red-600 font-lao">
+                            <td class="p-3 bg-yellow-200 rounded-l-lg">{{ fine.receiptNumber }}</td>
+                            <td class="p-3 bg-yellow-200">{{ fine.officer}}</td>
+                            <td class="p-3 bg-yellow-200">{{ fine.offenses }}</td>
+                            <td class="p-3 bg-yellow-200">{{ fine.vehicleType }}</td>
+                            <td class="p-3 bg-yellow-200">{{ fine.time }}</td>
+                            <td class="p-3 bg-yellow-200">{{ fine.date }}</td>
+                            <td class="p-3 bg-yellow-200">{{ fine.totalAmount }} ກີບ</td>
+                            <td class="p-3 bg-yellow-200 rounded-r-lg">
                                 <button @click="showDetailsPopup = true"
                                     class="bg-gray-800 text-cyan-400 font-bold py-1 px-3 rounded-md flex items-center space-x-2 shadow-lg hover:bg-gray-700 transition-colors">
                                     <span>ລາຍລະອຽດ</span>
