@@ -2,6 +2,7 @@
 import FinesPage from '@/components/FinesPage.vue'
 import Police_home from '@/components/Police_home.vue'
 import Rules from '@/components/Rules.vue'
+import ReportFines from '@/components/ReportFines.vue'
 import { ref } from 'vue'
 
 // Tabs state
@@ -69,7 +70,14 @@ const setActiveTab = (tab: string) => {
                     activeTab === 'fines' ? 'bg-sky-900 text-white' : 'hover:bg-blue-700']">ການປັບໄໝ
                 </button>
 
-                <!-- Tab 3: Traffic Rules -->
+                <!-- Tab 3: ReportFines -->
+                <button 
+                    @click="setActiveTab('ReportFines')"
+                    :class="['block w-full text-left py-3 px-4 rounded transition-colors font-lao',
+                    activeTab === 'ReportFines' ? 'bg-sky-900 text-white' : 'hover:bg-blue-700']">ລາຍງານການປັບໄໝ
+                </button>
+
+                <!-- Tab 4: Traffic Rules -->
                 <button 
                     @click="setActiveTab('rules')"
                     :class="['block w-full text-left py-3 px-4 rounded transition-colors font-lao',
@@ -84,6 +92,10 @@ const setActiveTab = (tab: string) => {
             <!-- Tab Content: Main Page -->
             <div v-if="activeTab === 'fines'" class="space-y-6">
                 <FinesPage />
+            </div>
+            <!-- Tab Content: Main Page -->
+            <div v-if="activeTab === 'ReportFines'" class="space-y-6">
+                <ReportFines />
             </div>
             <!-- Tab Content: Fines -->
             <div v-if="activeTab === 'main'" class="space-y-6">

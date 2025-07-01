@@ -32,7 +32,7 @@ const fines = ref([
   },
   {
     id: 2,
-    receiptNumber: 'XXXXX',
+    receiptNumber: 'YYYYY',
     officer: 'YYYYYYYY',
     offenses: 'YY',
     vehicleType: 'YYYYY',
@@ -197,6 +197,16 @@ const fines = ref([
                 <span class="text-sm text-black font-medium">ວັນເດືອນປີ:</span>
                 <span class="text-red-500 font-bold">{{ modalData.date }}</span>
               </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex space-x-3">
+              <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">
+                ປະຕິເສດ ✕
+              </button>
+              <button class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors">
+                ອະນຸມັດ ➤
+              </button>
             </div>
           </div>
         </div>

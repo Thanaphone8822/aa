@@ -85,7 +85,7 @@ const setActiveTab = (tab) => {
                         <span class="text-white">ໃບສັ່ງທີ່ໄດ້ຮັບ</span>
                     </a>
                 </div>
-                <button @click="showNoti = !showNoti" class="btn btn-sm bg-blue-700 hover:bg-blue-600 text-white mr-4 flex items-center gap-2">
+                <button @click="showNoti = !showNoti" class="btn btn-sm h-10 w-44 text-base bg-cyan-600 hover:bg-blue-600 text-white mr-4 flex items-center gap-2">
                     ການແຈ້ງເຕືອນ
                     <Notificationicon />
                 </button>

@@ -96,6 +96,11 @@ const router = createRouter({
       path: '/confirm',
       name: 'confirm',
       component: () => import('../components/Confirm.vue'),
+    },
+    {
+      path: '/reportfines',
+      name: 'reportfines',
+      component: () => import('../components/ReportFines.vue'),
     }
     
   ],
