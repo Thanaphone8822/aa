@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import FineDetails from "@/components/FineDetails.vue";
 
-    const showDetailsPopup = ref(false);
+const showDetailsPopup = ref(false);
+const closeModal = () => {
+  showDetailsPopup.value = false;
+};
     const Hfines = ref([
         {
             id: 1,
@@ -22,7 +26,57 @@ import { ref } from "vue";
             time: '00:00',
             date: '00/00/0000',
             totalAmount: '00000000000'
-        }
+        },
+        {
+            id: 1,
+            receiptNumber: 'XXXXXX',
+            officer: 'XXXXXX',
+            offenses: 'XX',
+            vehicleType: 'XXXXXXXXXXXXXX',
+            time: '00:00',
+            date: '00/00/0000',
+            totalAmount: '00000000000'
+        },
+        {
+            id: 1,
+            receiptNumber: 'XXXXXX',
+            officer: 'XXXXXX',
+            offenses: 'XX',
+            vehicleType: 'XXXXXXXXXXXXXX',
+            time: '00:00',
+            date: '00/00/0000',
+            totalAmount: '00000000000'
+        },
+        {
+            id: 1,
+            receiptNumber: 'XXXXXX',
+            officer: 'XXXXXX',
+            offenses: 'XX',
+            vehicleType: 'XXXXXXXXXXXXXX',
+            time: '00:00',
+            date: '00/00/0000',
+            totalAmount: '00000000000'
+        },
+        {
+            id: 1,
+            receiptNumber: 'XXXXXX',
+            officer: 'XXXXXX',
+            offenses: 'XX',
+            vehicleType: 'XXXXXXXXXXXXXX',
+            time: '00:00',
+            date: '00/00/0000',
+            totalAmount: '00000000000'
+        },
+        {
+            id: 1,
+            receiptNumber: 'XXXXXX',
+            officer: 'XXXXXX',
+            offenses: 'XX',
+            vehicleType: 'XXXXXXXXXXXXXX',
+            time: '00:00',
+            date: '00/00/0000',
+            totalAmount: '00000000000'
+        },
     ])
 </script>
 
@@ -30,18 +84,18 @@ import { ref } from "vue";
     <div class="p-4 rounded-lg">
         <div class="bg-white p-6 rounded-lg shadow-md">
             <h1 class="text-3xl font-bold mb-4 font-lao text-gray-800 border-b pb-2">ປະຫວັດການຖືກປັບ</h1>
-            <div class="mt-4">
+            <div class="mt-4 rounded shadow h-95 w-full touch-auto overflow-auto">
                 <table class="w-full border-separate" style="border-spacing: 0 0.5rem;">
-                    <thead>
+                    <thead class="sticky top-0 bg-stone-300 shadow-sm">
                         <tr class="font-bold text-gray-700 font-lao">
-                            <th class="p-3 text-left bg-yellow-200 rounded-l-lg">ເລກທີໃບສັ່ງ</th>
-                            <th class="p-3 text-left bg-yellow-200">ປັບໃໝໂດຍເຈົ້າໜ້າທີ່</th>
-                            <th class="p-3 text-left bg-yellow-200">ຈຳນວນຂໍ້ຫາ</th>
-                            <th class="p-3 text-left bg-yellow-200">ປະເພດພາຫະນະ</th>
-                            <th class="p-3 text-left bg-yellow-200">ເວລາ</th>
-                            <th class="p-3 text-left bg-yellow-200">ວັນເດືອນປີ</th>
-                            <th class="p-3 text-left bg-yellow-200">ເງິນລວມ</th>
-                            <th class="p-3 text-left bg-yellow-200 rounded-r-lg"></th>
+                            <th class="p-3 text-left bg-yellow-500 rounded-l-lg">ເລກທີໃບສັ່ງ</th>
+                            <th class="p-3 text-left bg-yellow-500">ປັບໃໝໂດຍເຈົ້າໜ້າທີ່</th>
+                            <th class="p-3 text-left bg-yellow-500">ຈຳນວນຂໍ້ຫາ</th>
+                            <th class="p-3 text-left bg-yellow-500">ປະເພດພາຫະນະ</th>
+                            <th class="p-3 text-left bg-yellow-500">ເວລາ</th>
+                            <th class="p-3 text-left bg-yellow-500">ວັນເດືອນປີ</th>
+                            <th class="p-3 text-left bg-yellow-500">ເງິນລວມ</th>
+                            <th class="p-3 text-left bg-yellow-500 rounded-r-lg"></th>
                         </tr>
                     </thead>
                     <tbody class="overflow-y-scroll">
@@ -66,43 +120,9 @@ import { ref } from "vue";
                 </table>
             </div>
         </div>
-        <div v-if="showDetailsPopup"
-            class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-            <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-2xl w-full mx-4">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-2xl font-bold text-neutral-800">ລາຍລະອຽດການກະທໍາຜິດ</h3>
-                    <button @click="showDetailsPopup = false"
-                        class="text-neutral-400 hover:text-neutral-600 transition-colors">
-                        <span class="text-black">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </span>
-                    </button>
-                </div>
-                <div class="space-y-6">
-                    <div class="grid grid-cols-2 gap-6">
-                        <div class="bg-neutral-50 p-4 rounded-xl">
-                            <p class="text-sm font-semibold text-neutral-600 mb-1">ເລກໃບສັ່ງ:</p>
-                            <p class="text-base text-neutral-800 font-medium">00001</p>
-                        </div>
-                        <div class="bg-neutral-50 p-4 rounded-xl">
-                            <p class="text-sm font-semibold text-neutral-600 mb-1">ຊື່ ແລະ ນາມສະກຸນ:</p>
-                            <p class="text-base text-neutral-800 font-medium">XXXXXXXX</p>
-                        </div>
-                        <div class="bg-neutral-50 p-4 rounded-xl">
-                            <p class="text-sm font-semibold text-neutral-600 mb-1">ຈໍານວນຂໍ້ຫາ:</p>
-                            <p class="text-base text-neutral-800 font-medium">XX</p>
-                        </div>
-                        <div class="bg-neutral-50 p-4 rounded-xl">
-                            <p class="text-sm font-semibold text-neutral-600 mb-1">ເງິນລວມ:</p>
-                            <p class="text-base text-neutral-800 font-medium">XXXXXXXX ກີບ</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+      <div v-if="showDetailsPopup" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50" @click="closeModal">
+        <FineDetails @close="closeModal" @click.stop />
+      </div>
     </div>
 </template>
 
