@@ -224,6 +224,18 @@ const handleAddMore = () => {
 }
 
 const handleClear = () => {
+  // Only clear the fineing section (form fields)
+  vehicleType.value = ''
+  violationTypes.value = []
+  selectedViolationType.value = ''
+  articles.value = []
+  
+  // Keep summary section intact - don't clear finalized data
+  console.log('Fineing section cleared')
+}
+
+const handleClearAll = () => {
+  // Clear both fineing section and summary section
   vehicleType.value = ''
   violationTypes.value = []
   selectedViolationType.value = ''
@@ -236,7 +248,7 @@ const handleClear = () => {
   currentFinalizedArticles.value = []
   currentFinalizedVehicleType.value = ''
   
-  console.log('Form and summary cleared')
+  console.log('Both fineing and summary sections cleared')
 }
 
 const addViolationType = () => {
@@ -459,7 +471,7 @@ const generateReceipt = () => {
           class="flex items-center justify-center px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-colors"
         >
         <trashicon />
-          Clear
+          Clear Form
         </button>
 
         <button 
@@ -569,8 +581,20 @@ const generateReceipt = () => {
       </div>
     </div>
 
-    <!-- Generate Receipt Button -->
-    <div class="mt-6 flex justify-end">
+    <!-- Action Buttons -->
+    <div class="mt-6 flex justify-between items-center">
+      <!-- Clear All Button -->
+      <button 
+        @click="handleClearAll"
+        class="flex items-center justify-center px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-colors"
+      >
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+        </svg>
+        Clear All
+      </button>
+      
+      <!-- Generate Receipt Button -->
       <button 
         @click="generateReceipt"
         class="flex items-center justify-center px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
