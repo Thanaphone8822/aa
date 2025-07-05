@@ -7,6 +7,8 @@ import FineDetails from '@/components/FineDetails.vue';
 
 const showDetailsPopup = ref(false);
 const showPaymentSection = ref(false);
+const selectedFile = ref(null);
+const fileInput = ref(null);
 
 const closeModal = () => {
   showDetailsPopup.value = false;
@@ -18,6 +20,36 @@ const openPaymentSection = () => {
 
 const closePaymentSection = () => {
   showPaymentSection.value = false;
+  selectedFile.value = null;
+};
+
+const triggerFileUpload = () => {
+  fileInput.value?.click();
+};
+
+const handleFileUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    // Check if file is an image
+    if (file.type.startsWith('image/')) {
+      selectedFile.value = file;
+      console.log('File selected:', file.name, file.size, file.type);
+    } else {
+      alert('ກະລຸນາເລືອກໄຟລ์ຮູບພາບເທົ່ານັ້ນ (Please select image files only)');
+      event.target.value = '';
+    }
+  }
+};
+
+const submitPaymentEvidence = () => {
+  if (selectedFile.value) {
+    console.log('Submitting payment evidence:', selectedFile.value);
+    // Here you would typically upload the file to your server
+    alert('ສົ່ງຮູບການຊໍາລະສໍາເລັດ (Payment evidence submitted successfully)');
+    closePaymentSection();
+  } else {
+    alert('ກະລຸນາເລືອກຮູບການຊໍາລະກ່ອນ (Please select payment evidence first)');
+  }
 };
 
 const fines = ref([
@@ -145,7 +177,7 @@ const fines = ref([
 
     <!-- Payment QR Code Section -->
     <div v-if="showPaymentSection" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50" @click="closePaymentSection">
-      <div @click.stop class="bg-gray-300 rounded-lg p-6 max-w-md w-full mx-4 relative">
+      <div @click.stop class="bg-gray-300 rounded-lg p-10 max-w-md w-full mx-4 relative">
         <!-- Close Button -->
         <button @click="closePaymentSection" class="absolute top-4 right-4 text-gray-600 hover:text-black z-10">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -171,18 +203,52 @@ const fines = ref([
           </div>
         </div>
 
+        <!-- File Input (Hidden) -->
+        <input 
+          ref="fileInput"
+          type="file" 
+          accept="image/*" 
+          @change="handleFileUpload"
+          class="hidden"
+        />
+
+        <!-- Selected File Display -->
+        <div v-if="selectedFile" class="mb-4 p-3 bg-green-100 rounded-lg">
+          <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span class="text-green-800 text-sm font-medium">{{ selectedFile.name }}</span>
+            <span class="text-green-600 text-xs">({{ (selectedFile.size / 1024).toFixed(1) }} KB)</span>
+          </div>
+        </div>
+
         <!-- Action Buttons -->
         <div class="flex space-x-3">
           <!-- Upload Evidence Button -->
-          <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center flex-1 space-x-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <button 
+            @click="triggerFileUpload"
+            :class="selectedFile ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'"
+            class="text-white px-4 py-2 rounded-lg flex items-center justify-center flex-1 space-x-2 transition-colors duration-200"
+          >
+            <svg v-if="!selectedFile" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
             </svg>
-            <span class="text-sm">ອັບໂຫລດຮູບການຊໍາລະ</span>
+            <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            <span class="text-sm">
+              {{ selectedFile ? 'ເປ່ຽນຮູບ' : 'ອັບໂຫລດຮູບການຊໍາລະ' }}
+            </span>
           </button>
           
           <!-- Payment Complete Button -->
-          <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center justify-center flex-1 space-x-2">
+          <button 
+            @click="submitPaymentEvidence"
+            :disabled="!selectedFile"
+            :class="selectedFile ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed'"
+            class="text-white px-4 py-2 rounded-lg flex items-center justify-center flex-1 space-x-2 transition-colors duration-200"
+          >
             <span class="text-sm">ສົ່ງຮູບການຊໍາລະ</span>
             <ArrowRight />
           </button>

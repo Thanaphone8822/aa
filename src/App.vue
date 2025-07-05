@@ -7,6 +7,7 @@ import Licence_card from './components/Licence_card.vue';
 import Payment from './components/Payment.vue';
 import Confirm from './components/Confirm.vue';
 import TabRightNoti from './views/TabRightNoti.vue';
+import LoginandRegister from './views/LoginandRegister.vue';
 
 </script>
 
@@ -14,10 +15,11 @@ import TabRightNoti from './views/TabRightNoti.vue';
   <div class="bg-white">
     <!-- <Payment/> -->
     <!-- <Licence_card/>  -->
-    <P_mainView />
+    <!-- <P_mainView /> -->
     <!-- <Licence_card/> -->
     <!-- <MainView /> -->
     <!-- <Confirm/> -->
+    <LoginandRegister />
   </div>
 </template>
 
