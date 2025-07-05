@@ -1,16 +1,26 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import trashicon from './icons/trashicon.vue'
 
 // Form data
 const vehicleType = ref<string>('')
 const violationTypes = ref<string[]>([])
 const articles = ref<string[]>([])
+const selectedViolationType = ref<string>('')
 
 // Summary form data
 const complaintDetails = ref('')
 const showSummarySection = ref(false)
 const summaryFinalized = ref(false)
+
+// Finalized summary data
+const finalizedItems = ref<{
+  vehicleType: string
+  articles: string[]
+  timestamp: string
+}[]>([])
+const currentFinalizedArticles = ref<string[]>([])
+const currentFinalizedVehicleType = ref<string>('')
 
 // Price mapping for each article
 const articlePrices: { [key: string]: number } = {
@@ -150,9 +160,24 @@ const availableArticles = computed(() => {
 // Check if any violation type is selected
 const hasSelectedViolations = computed(() => violationTypes.value.length > 0)
 
-// Calculate total price of selected articles
-const totalPrice = computed(() => {
+// Get available violation options (excluding already selected ones)
+const availableViolationOptions = computed(() => {
+  return violationOptions.filter(option => !violationTypes.value.includes(option))
+})
+
+// Auto-show summary section when finalized articles exist
+const shouldShowSummary = computed(() => currentFinalizedArticles.value.length > 0)
+
+// Calculate total price of currently selected articles (for fineing section)
+const selectedTotalPrice = computed(() => {
   return articles.value.reduce((total, article) => {
+    return total + (articlePrices[article] || 0)
+  }, 0)
+})
+
+// Calculate total price of finalized articles (for summary section)
+const totalPrice = computed(() => {
+  return currentFinalizedArticles.value.reduce((total, article) => {
     return total + (articlePrices[article] || 0)
   }, 0)
 })
@@ -162,16 +187,70 @@ const formatPrice = (price: number) => {
   return new Intl.NumberFormat('lo-LA').format(price) + ' ກີບ'
 }
 
+// Watch for vehicle type changes and clear violation types (but not finalized data)
+watch(vehicleType, () => {
+  violationTypes.value = []
+  selectedViolationType.value = ''
+  articles.value = []
+})
+
 const handleAddMore = () => {
-  showSummarySection.value = true
-  summaryFinalized.value = true
-  console.log('Adding more items...')
+  // Only add if there are selected articles
+  if (articles.value.length > 0 && vehicleType.value) {
+    // Add to finalized items
+    finalizedItems.value.push({
+      vehicleType: vehicleType.value,
+      articles: [...articles.value],
+      timestamp: new Date().toISOString()
+    })
+    
+    // Update current finalized data for summary display
+    currentFinalizedArticles.value = [...currentFinalizedArticles.value, ...articles.value]
+    currentFinalizedVehicleType.value = vehicleType.value
+    
+    // Clear form after adding
+    vehicleType.value = ''
+    violationTypes.value = []
+    selectedViolationType.value = ''
+    articles.value = []
+    
+    console.log('Items added to summary:', {
+      finalizedItems: finalizedItems.value,
+      currentFinalizedArticles: currentFinalizedArticles.value
+    })
+  } else {
+    console.log('Please select vehicle type and articles first')
+  }
 }
 
 const handleClear = () => {
   vehicleType.value = ''
   violationTypes.value = []
-  console.log('Form cleared')
+  selectedViolationType.value = ''
+  articles.value = []
+  showSummarySection.value = false
+  summaryFinalized.value = false
+  
+  // Clear finalized data
+  finalizedItems.value = []
+  currentFinalizedArticles.value = []
+  currentFinalizedVehicleType.value = ''
+  
+  console.log('Form and summary cleared')
+}
+
+const addViolationType = () => {
+  if (selectedViolationType.value && !violationTypes.value.includes(selectedViolationType.value)) {
+    violationTypes.value.push(selectedViolationType.value)
+    selectedViolationType.value = ''
+  }
+}
+
+const removeViolationType = (violationType: string) => {
+  const index = violationTypes.value.indexOf(violationType)
+  if (index > -1) {
+    violationTypes.value.splice(index, 1)
+  }
 }
 
 const handleApprove = () => {
@@ -214,28 +293,38 @@ const editArticle = (article: string) => {
 }
 
 const removeArticle = (articleToRemove: string) => {
-  const index = articles.value.indexOf(articleToRemove)
+  const index = currentFinalizedArticles.value.indexOf(articleToRemove)
   if (index > -1) {
-    articles.value.splice(index, 1)
-    if (articles.value.length === 0) {
+    currentFinalizedArticles.value.splice(index, 1)
+    
+    // Also remove from finalized items
+    finalizedItems.value = finalizedItems.value.map(item => ({
+      ...item,
+      articles: item.articles.filter(article => article !== articleToRemove)
+    })).filter(item => item.articles.length > 0)
+    
+    if (currentFinalizedArticles.value.length === 0) {
       showSummarySection.value = false
       summaryFinalized.value = false
+      currentFinalizedVehicleType.value = ''
     }
   }
 }
 
 const generateReceipt = () => {
   console.log('Generating receipt...', {
-    articles: articles.value,
+    articles: currentFinalizedArticles.value,
     totalPrice: totalPrice.value,
     finesCode: generateFinesCode(),
-    vehicleType: vehicleType.value,
-    complaintDetails: complaintDetails.value
+    vehicleType: currentFinalizedVehicleType.value,
+    complaintDetails: complaintDetails.value,
+    finalizedItems: finalizedItems.value
   })
 }
 </script>
 
 <template>
+  <!-- Fineing Section -->
   <div class="max-w-4xl mx-auto p-6 bg-gray-100">
     <!-- Header -->
     <h1 class="text-2xl font-bold text-center mb-8 text-black">ເລືອກຂໍ້ຫາອອກໃບສັ່ງ</h1>
@@ -244,20 +333,16 @@ const generateReceipt = () => {
       <!-- Vehicle Types Section -->
       <div class="bg-gray-200 p-6 rounded-lg">
         <h2 class="text-xl font-semibold mb-4 text-black">ປະເພດລົດ</h2>
-        <div class="bg-white p-4 rounded-lg space-y-3">
-          <div v-for="option in vehicleOptions" :key="option" class="flex items-center">
-            <input 
-              type="radio" 
-              :id="'vehicle-' + option"
-              :value="option"
-              v-model="vehicleType"
-              name="vehicleType"
-              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-            >
-            <label :for="'vehicle-' + option" class="ml-3 text-sm text-gray-700 cursor-pointer">
+        <div class="bg-white p-4 rounded-lg">
+          <select 
+            v-model="vehicleType"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+          >
+            <option value="" disabled>ເລືອກປະເພດລົດ</option>
+            <option v-for="option in vehicleOptions" :key="option" :value="option">
               {{ option }}
-            </label>
-          </div>
+            </option>
+          </select>
         </div>
       </div>
 
@@ -265,17 +350,33 @@ const generateReceipt = () => {
       <div class="bg-gray-200 p-6 rounded-lg">
         <h2 class="text-xl font-semibold mb-4 text-gray-700">ປະເພດໝວດ</h2>
         <div class="bg-white p-4 rounded-lg space-y-3">
-          <div v-for="option in violationOptions" :key="option" class="flex items-center">
-            <input 
-              type="checkbox" 
-              :id="'violation-' + option"
-              :value="option"
-              v-model="violationTypes"
-              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-            >
-            <label :for="'violation-' + option" class="ml-3 text-sm text-gray-700 cursor-pointer">
+          <!-- Dropdown for selecting violation types -->
+          <select 
+            v-model="selectedViolationType"
+            @change="addViolationType"
+            :disabled="!vehicleType"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-500"
+          >
+            <option value="">
+              {{ vehicleType ? 'ເລືອກໝວດ' : 'ເລືອກປະເພດລົດກ່ອນ' }}
+            </option>
+            <option v-for="option in availableViolationOptions" :key="option" :value="option">
               {{ option }}
-            </label>
+            </option>
+          </select>
+          
+          <!-- Selected violation types as removable tags -->
+          <div v-if="violationTypes.length > 0" class="flex flex-wrap gap-2 mt-3">
+            <div v-for="violationType in violationTypes" :key="violationType" 
+                 class="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+              <span>{{ violationType }}</span>
+              <button @click="removeViolationType(violationType)" 
+                      class="ml-2 text-blue-600 hover:text-blue-800 focus:outline-none">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -339,7 +440,7 @@ const generateReceipt = () => {
             <div class="pt-4">
               <div class="flex justify-between items-center p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
                 <span class="text-lg font-semibold text-gray-800">ລວມທັງໝົດ (Total):</span>
-                <span class="text-xl font-bold text-blue-600">{{ formatPrice(totalPrice) }}</span>
+                <span class="text-xl font-bold text-blue-600">{{ formatPrice(selectedTotalPrice) }}</span>
               </div>
             </div>
           </div>
@@ -358,17 +459,18 @@ const generateReceipt = () => {
           class="flex items-center justify-center px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-colors"
         >
         <trashicon />
-          ລ້າງຂໍ້ມູນ
+          Clear
         </button>
 
         <button 
           @click="handleAddMore"
-          class="flex items-center justify-center px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
+          :disabled="!vehicleType || articles.length === 0"
+          class="flex items-center justify-center px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
-          ເພີ່ມຂໍ້ຫາ
+          Add ({{ articles.length }})
         </button>
       </div>
     </div>
@@ -376,7 +478,7 @@ const generateReceipt = () => {
 
   <!-- Summary Section -->
   <div class="max-w-6xl mx-auto p-6 bg-gray-100 mt-8">
-    <h1 class="text-2xl font-bold text-center mb-8 text-black">ຈັດການອອກສະຫງົບ</h1>
+    <h1 class="text-2xl font-bold text-center mb-8 text-black">ຈັດການອອກໃບສັ່ງ</h1>
     
     <!-- Summary Table -->
     <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
@@ -393,18 +495,13 @@ const generateReceipt = () => {
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-if="!summaryFinalized">
+            <tr v-if="!shouldShowSummary">
               <td colspan="6" class="px-4 py-8 text-center text-gray-500">
-                ກົດປຸ່ມ "ເພີ່ມຂໍ້ຫາ" ເພື່ອສະແດງລາຍການ<br>
-                (Click "ເພີ່ມຂໍ້ຫາ" button to show list)
+                ເລືອກຂໍ້ຫາແລ້ວກົດປຸ່ມ "Add" ເພື່ອເພີ່ມໃສ່ສະຫງົບ<br>
+                (Select violations and click "Add" button to add to summary)
               </td>
             </tr>
-            <tr v-else-if="summaryFinalized && articles.length === 0">
-              <td colspan="6" class="px-4 py-8 text-center text-gray-500">
-                ບໍ່ມີຂໍ້ມູນທີ່ເລືອກ (No data selected)
-              </td>
-            </tr>
-            <tr v-else-if="summaryFinalized" v-for="(article, index) in articles" :key="article" class="hover:bg-gray-50">
+            <tr v-else v-for="(article, index) in currentFinalizedArticles" :key="article" class="hover:bg-gray-50">
               <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{{ index + 1 }}</td>
               <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                 {{ getViolationTypeForArticle(article) }}
@@ -439,7 +536,7 @@ const generateReceipt = () => {
         <div class="space-y-4">
           <div class="flex justify-between items-center">
             <span class="text-black">ຈຳນວນຂໍ້ຫາ:</span>
-            <span class="text-black font-semibold">{{ articles.length }} ລາຍການ</span>
+            <span class="text-black font-semibold">{{ currentFinalizedArticles.length }} ລາຍການ</span>
           </div>
           
           <div class="flex justify-between items-center">
@@ -455,7 +552,7 @@ const generateReceipt = () => {
           <div class="flex justify-between items-center">
             <span class="text-black">ປະເພດລົດ:</span>
             <span class="text-black font-semibold">
-              {{ vehicleType || 'ບໍ່ໄດ້ເລືອກ' }}
+              {{ currentFinalizedVehicleType || 'ບໍ່ໄດ້ເລືອກ' }}
             </span>
           </div>
         </div>

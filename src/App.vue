@@ -14,9 +14,9 @@ import TabRightNoti from './views/TabRightNoti.vue';
   <div class="bg-white">
     <!-- <Payment/> -->
     <!-- <Licence_card/>  -->
-    <!-- <P_mainView /> -->
+    <P_mainView />
     <!-- <Licence_card/> -->
-    <MainView />
+    <!-- <MainView /> -->
     <!-- <Confirm/> -->
   </div>
 </template>
