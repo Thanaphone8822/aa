@@ -8,6 +8,11 @@ const violationTypes = ref<string[]>([])
 const articles = ref<string[]>([])
 const selectedViolationType = ref<string>('')
 
+// New data structure for specific violations
+const selectedViolations = ref<{
+  [articleKey: string]: string[]
+}>({})
+
 // Summary form data
 const complaintDetails = ref('')
 const showSummarySection = ref(false)
@@ -16,11 +21,107 @@ const summaryFinalized = ref(false)
 // Finalized summary data
 const finalizedItems = ref<{
   vehicleType: string
-  articles: string[]
+  violations: { [articleKey: string]: string[] }
   timestamp: string
 }[]>([])
-const currentFinalizedArticles = ref<string[]>([])
+const currentFinalizedViolations = ref<{
+  [articleKey: string]: string[]
+}>({})
 const currentFinalizedVehicleType = ref<string>('')
+
+// Title/Category mapping for each article (8 titles per article)
+const articleTitles: { [key: string]: string[] } = {
+  'ມາດຕາ 6: ຜູ້ຂັບຂີ່ທີ່ບໍ່ເຖິງກະສຽນອາຍຸ': [
+    'ຂັບຂີ່ໂດຍບໍ່ມີໃບຂັບຂີ່',
+    'ໃບຂັບຂີ່ປອມ ຫຼື ແກ້ໄຂ',
+    'ອາຍຸຕ່ຳກວ່າ 18 ປີ',
+    'ບໍ່ຜ່ານການທົດສອບ',
+    'ໃຊ້ໃບຂັບຂີ່ຂອງຄົນອື່ນ',
+    'ໃບຂັບຂີ່ຖືກຍຶດ',
+    'ໃບຂັບຂີ່ຖືກເພີກຖອນ',
+    'ບໍ່ມີສິດຂັບຂີ່ຕາມກົດໝາຍ'
+  ],
+  'ມາດຕາ 7: ຜູ້ຂັບຂີ່ລົດທຸກປະເພດໃນເວລາທີ່ມີທາດເຫຼົ້າໃນຮ່າງກາຍ': [
+    'ດື່ມເຫຼົ້າຂະນະຂັບຂີ່',
+    'ມີທາດແອລກໍຮໍເກີນກຳນົດ',
+    'ແນມເຫືຼິງເຫຼົ້າຢ່າງຊັດເຈນ',
+    'ປະຕິເສດການກວດສອບ',
+    'ດື່ມຢາເສບຕິດ',
+    'ຂັບຂີ່ໃນສະພາບເມົາ',
+    'ມີພະຍານຢຸດການດື່ມ',
+    'ມີບັນຫາສຸຂະພາບຈາກການດື່ມ'
+  ],
+  'ມາດຕາ 8: ການຂັບຂີ່ລົດໂດຍບໍ່ມີເອກະສານຄົບຖ້ວນ': [
+    'ບໍ່ມີໃບຂັບຂີ່',
+    'ບໍ່ມີໃບທະບຽນລົດ',
+    'ບໍ່ມີໃບປະກັນໄພ',
+    'ບໍ່ມີໃບກວດສອບເຕັກນິກ',
+    'ເອກະສານໝົດອາຍຸ',
+    'ເອກະສານບໍ່ຄົບຖ້ວນ',
+    'ເອກະສານສູນຫາຍ',
+    'ເອກະສານເຊົາ ຫຼື ເປື້ອນ'
+  ],
+  'ມາດຕາ 9:  ເອກະສານລົດ, ໃບຂັບຂີ່ຍານພາຫະນະທີ່ໝົດກໍານົດ ຫຼື ບໍ່ຖືກຕ້ອງຕາມປະເພດລົດ': [
+    'ໃບຂັບຂີ່ໝົດອາຍຸ',
+    'ໃບທະບຽນໝົດອາຍຸ',
+    'ປະເພດລົດບໍ່ຕົງກັບໃບຂັບຂີ່',
+    'ໃບຂັບຂີ່ປະເພດຜິດ',
+    'ບໍ່ຕໍ່ອາຍຸໃບຂັບຂີ່',
+    'ບໍ່ຕໍ່ອາຍຸໃບທະບຽນ',
+    'ເອກະສານຖືກຍົກເລີກ',
+    'ຖືກເພີກຖອນສິດການຂັບຂີ່'
+  ],
+  'ມາດຕາ 10:  ລົດບໍ່ຕິດປ້າຍທະບຽນ, ຕິດປ້າຍທະບຽນບໍ່ຖືກຕ້ອງ ຫຼື ໝົດອາຍຸການນໍາໃຊ້': [
+    'ບໍ່ຕິດປ້າຍທະບຽນ',
+    'ປ້າຍທະບຽນປອມ',
+    'ປ້າຍທະບຽນບິດເບືອນ',
+    'ປ້າຍທະບຽນມົວ ຫຼື ເປື້ອນ',
+    'ປ້າຍທະບຽນໝົດອາຍຸ',
+    'ຕິດປ້າຍທະບຽນຜິດຕຳແໜ່ງ',
+    'ໃຊ້ປ້າຍທະບຽນຂອງລົດອື່ນ',
+    'ປິດປ້າຍທະບຽນ'
+  ],
+  'ມາດຕາ 11: ການນໍາໃຊ້ລົດບໍ່ໄດ້ກວດກາເຕັກນິກ ແລະ ການດັດແປງເຕັກນິກລົດ': [
+    'ບໍ່ກວດສອບເຕັກນິກປະຈຳປີ',
+    'ໃບກວດສອບໝົດອາຍຸ',
+    'ດັດແປງເຄື່ອງຈັກໂດຍບໍ່ມີອະນຸຍາດ',
+    'ດັດແປງລະບົບເບຼກ',
+    'ດັດແປງລະບົບແສງສະຫວ່າງ',
+    'ດັດແປງຕົວລົດ',
+    'ປ່ຽນສີລົດບໍ່ແຈ້ງ',
+    'ຕິດຕັ້ງອຸປະກອນບໍ່ມາດຕະຖານ'
+  ],
+  'ມາດຕາ 14: ການໃຊ້ຄວາມໄວເກີນກຳນົດ': [
+    'ຂັບໄວເກີນ 10-20 ກິໂລແມັດ/ຊົ່ວໂມງ',
+    'ຂັບໄວເກີນ 20-30 ກິໂລແມັດ/ຊົ່ວໂມງ',
+    'ຂັບໄວເກີນ 30-50 ກິໂລແມັດ/ຊົ່ວໂມງ',
+    'ຂັບໄວເກີນ 50+ ກິໂລແມັດ/ຊົ່ວໂມງ',
+    'ຂັບໄວໃນເຂດໂຮງຮຽນ',
+    'ຂັບໄວໃນເຂດບ້ານ',
+    'ຂັບໄວໃນເຂດໂຮງພະຍາບານ',
+    'ຂັບໄວໃນສະພາບອາກາດບໍ່ດີ'
+  ],
+  'ມາດຕາ 19: ການຂັບຂີ່ລົດແຂ່ງກັນ': [
+    'ແຂ່ງລົດທາງຫຼວງ',
+    'ແຂ່ງລົດໃນເມືອງ',
+    'ແຂ່ງລົດມີການລົງເງິນພະນັນ',
+    'ຈັດການແຂ່ງລົດບໍ່ໄດ້ອະນຸຍາດ',
+    'ມີຜູ້ເບິ່ງແຂ່ງລົດກີດຂວາງການຈະລາຈອນ',
+    'ແຂ່ງລົດເວລາກາງຄືນ',
+    'ແຂ່ງລົດໃນເຂດຫ້າມ',
+    'ກໍ່ຄວາມວຸ່ນວາຍຈາກການແຂ່ງລົດ'
+  ],
+  'ມາດຕາ 31:  ການຂັບຂີ່ລົດຈັກບໍ່ໃສ່ໝວກກັນກະທົບ': [
+    'ຜູ້ຂັບບໍ່ໃສ່ໝວກກັນກະທົບ',
+    'ຜູ້ໂດຍສານບໍ່ໃສ່ໝວກກັນກະທົບ',
+    'ໃສ່ໝວກບໍ່ມາດຕະຖານ',
+    'ໝວກກັນກະທົບຫຼຸດ ຫຼື ເສຍຫາຍ',
+    'ບໍ່ມັດສາຍໝວກກັນກະທົບ',
+    'ໃສ່ໝວກຜິດວິທີ',
+    'ໃຊ້ໝວກກັນກະທົບປອມ',
+    'ໝວກກັນກະທົບໝົດອາຍຸການນໍາໃຊ້'
+  ]
+}
 
 // Price mapping for each article
 const articlePrices: { [key: string]: number } = {
@@ -165,21 +266,33 @@ const availableViolationOptions = computed(() => {
   return violationOptions.filter(option => !violationTypes.value.includes(option))
 })
 
-// Auto-show summary section when finalized articles exist
-const shouldShowSummary = computed(() => currentFinalizedArticles.value.length > 0)
-
-// Calculate total price of currently selected articles (for fineing section)
-const selectedTotalPrice = computed(() => {
-  return articles.value.reduce((total, article) => {
-    return total + (articlePrices[article] || 0)
-  }, 0)
+// Auto-show summary section when finalized violations exist
+const shouldShowSummary = computed(() => {
+  return Object.keys(currentFinalizedViolations.value).length > 0
 })
 
-// Calculate total price of finalized articles (for summary section)
+// Calculate total price of currently selected violations (for fineing section)
+const selectedTotalPrice = computed(() => {
+  let total = 0
+  Object.entries(selectedViolations.value).forEach(([article, violations]) => {
+    if (violations.length > 0) {
+      // Each violation gets the full article price
+      total += (articlePrices[article] || 0) * violations.length
+    }
+  })
+  return total
+})
+
+// Calculate total price of finalized violations (for summary section)
 const totalPrice = computed(() => {
-  return currentFinalizedArticles.value.reduce((total, article) => {
-    return total + (articlePrices[article] || 0)
-  }, 0)
+  let total = 0
+  Object.entries(currentFinalizedViolations.value).forEach(([article, violations]) => {
+    if (violations.length > 0) {
+      // Each violation gets the full article price
+      total += (articlePrices[article] || 0) * violations.length
+    }
+  })
+  return total
 })
 
 // Format price to Lao Kip
@@ -195,17 +308,26 @@ watch(vehicleType, () => {
 })
 
 const handleAddMore = () => {
-  // Only add if there are selected articles
-  if (articles.value.length > 0 && vehicleType.value) {
+  // Only add if there are selected violations
+  const hasSelectedViolations = Object.values(selectedViolations.value).some(violations => violations.length > 0)
+  
+  if (hasSelectedViolations && vehicleType.value) {
     // Add to finalized items
     finalizedItems.value.push({
       vehicleType: vehicleType.value,
-      articles: [...articles.value],
+      violations: JSON.parse(JSON.stringify(selectedViolations.value)),
       timestamp: new Date().toISOString()
     })
     
     // Update current finalized data for summary display
-    currentFinalizedArticles.value = [...currentFinalizedArticles.value, ...articles.value]
+    Object.entries(selectedViolations.value).forEach(([article, violations]) => {
+      if (violations.length > 0) {
+        if (!currentFinalizedViolations.value[article]) {
+          currentFinalizedViolations.value[article] = []
+        }
+        currentFinalizedViolations.value[article].push(...violations)
+      }
+    })
     currentFinalizedVehicleType.value = vehicleType.value
     
     // Clear form after adding
@@ -213,13 +335,14 @@ const handleAddMore = () => {
     violationTypes.value = []
     selectedViolationType.value = ''
     articles.value = []
+    selectedViolations.value = {}
     
     console.log('Items added to summary:', {
       finalizedItems: finalizedItems.value,
-      currentFinalizedArticles: currentFinalizedArticles.value
+      currentFinalizedViolations: currentFinalizedViolations.value
     })
   } else {
-    console.log('Please select vehicle type and articles first')
+    console.log('Please select vehicle type and specific violations first')
   }
 }
 
@@ -229,6 +352,7 @@ const handleClear = () => {
   violationTypes.value = []
   selectedViolationType.value = ''
   articles.value = []
+  selectedViolations.value = {}
   
   // Keep summary section intact - don't clear finalized data
   console.log('Fineing section cleared')
@@ -240,12 +364,13 @@ const handleClearAll = () => {
   violationTypes.value = []
   selectedViolationType.value = ''
   articles.value = []
+  selectedViolations.value = {}
   showSummarySection.value = false
   summaryFinalized.value = false
   
   // Clear finalized data
   finalizedItems.value = []
-  currentFinalizedArticles.value = []
+  currentFinalizedViolations.value = {}
   currentFinalizedVehicleType.value = ''
   
   console.log('Both fineing and summary sections cleared')
@@ -299,33 +424,74 @@ const getViolationTypeForArticle = (article: string) => {
   return 'N/A'
 }
 
-const editArticle = (article: string) => {
-  console.log('Editing article:', article)
+const getArticleTitles = (article: string) => {
+  return articleTitles[article] || []
+}
+
+const getArticleTitleCount = (article: string) => {
+  return articleTitles[article]?.length || 0
+}
+
+// New functions for violation management
+const toggleViolation = (article: string, violation: string) => {
+  if (!selectedViolations.value[article]) {
+    selectedViolations.value[article] = []
+  }
+  
+  const index = selectedViolations.value[article].indexOf(violation)
+  if (index > -1) {
+    selectedViolations.value[article].splice(index, 1)
+    if (selectedViolations.value[article].length === 0) {
+      delete selectedViolations.value[article]
+    }
+  } else {
+    selectedViolations.value[article].push(violation)
+  }
+}
+
+const isViolationSelected = (article: string, violation: string) => {
+  return selectedViolations.value[article]?.includes(violation) || false
+}
+
+const editViolation = (article: string, violation: string) => {
+  console.log('Editing violation:', { article, violation })
   // Add edit functionality here if needed
 }
 
-const removeArticle = (articleToRemove: string) => {
-  const index = currentFinalizedArticles.value.indexOf(articleToRemove)
-  if (index > -1) {
-    currentFinalizedArticles.value.splice(index, 1)
-    
-    // Also remove from finalized items
-    finalizedItems.value = finalizedItems.value.map(item => ({
-      ...item,
-      articles: item.articles.filter(article => article !== articleToRemove)
-    })).filter(item => item.articles.length > 0)
-    
-    if (currentFinalizedArticles.value.length === 0) {
-      showSummarySection.value = false
-      summaryFinalized.value = false
-      currentFinalizedVehicleType.value = ''
+const removeViolation = (article: string, violation: string) => {
+  if (currentFinalizedViolations.value[article]) {
+    const index = currentFinalizedViolations.value[article].indexOf(violation)
+    if (index > -1) {
+      currentFinalizedViolations.value[article].splice(index, 1)
+      
+      // Remove article key if no violations left
+      if (currentFinalizedViolations.value[article].length === 0) {
+        delete currentFinalizedViolations.value[article]
+      }
+      
+      // Also remove from finalized items
+      finalizedItems.value = finalizedItems.value.map(item => ({
+        ...item,
+        violations: Object.fromEntries(
+          Object.entries(item.violations).map(([key, violations]) => [
+            key,
+            violations.filter(v => !(key === article && v === violation))
+          ]).filter(([, violations]) => violations.length > 0)
+        )
+      })).filter(item => Object.keys(item.violations).length > 0)
+      
+      if (Object.keys(currentFinalizedViolations.value).length === 0) {
+        showSummarySection.value = false
+        summaryFinalized.value = false
+        currentFinalizedVehicleType.value = ''
+      }
     }
   }
 }
 
 const generateReceipt = () => {
   console.log('Generating receipt...', {
-    articles: currentFinalizedArticles.value,
+    violations: currentFinalizedViolations.value,
     totalPrice: totalPrice.value,
     finesCode: generateFinesCode(),
     vehicleType: currentFinalizedVehicleType.value,
@@ -397,8 +563,8 @@ const generateReceipt = () => {
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       <!-- Articles Section -->
       <div class="bg-gray-200 p-6 rounded-lg">
-        <h2 class="text-xl font-semibold mb-4 text-black">ມາດຕາ</h2>
-        <div class="bg-white p-4 rounded-lg space-y-3">
+        <h2 class="text-xl font-semibold mb-4 text-black">ເລືອກການລະເມີດສະເພາະ</h2>
+        <div class="bg-white p-4 rounded-lg space-y-4">
           <!-- Show message when no violation types are selected -->
           <div v-if="!hasSelectedViolations" class="text-center text-gray-500 py-8">
             <p>ກະລຸນາເລືອກໝວດທີກ່ອນເພື່ອເບິ່ງມາດຕາ</p>
@@ -406,18 +572,28 @@ const generateReceipt = () => {
           </div>
           
           <!-- Show articles when violation types are selected -->
-          <div v-else>
-            <div v-for="option in availableArticles" :key="option" class="flex items-center">
-              <input 
-                type="checkbox" 
-                :id="'article-' + option"
-                :value="option"
-                v-model="articles"
-                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-              >
-              <label :for="'article-' + option" class="ml-3 text-sm text-gray-700 cursor-pointer">
-                {{ option }}
-              </label>
+          <div v-else class="space-y-4">
+            <div v-for="article in availableArticles" :key="article" class="border rounded-lg p-4">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="font-semibold text-gray-800 text-sm">{{ article }}</h3>
+                <span class="text-blue-600 font-bold">{{ formatPrice(articlePrices[article] || 0) }}</span>
+              </div>
+              
+              <!-- Individual violation checkboxes -->
+              <div v-if="getArticleTitles(article).length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div v-for="(violation, index) in getArticleTitles(article)" :key="index" class="flex items-center">
+                  <input 
+                    type="checkbox" 
+                    :id="`violation-${article}-${index}`"
+                    :checked="isViolationSelected(article, violation)"
+                    @change="toggleViolation(article, violation)"
+                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                  >
+                  <label :for="`violation-${article}-${index}`" class="ml-2 text-xs text-gray-700 cursor-pointer">
+                    {{ violation }}
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -427,23 +603,42 @@ const generateReceipt = () => {
       <div class="bg-gray-200 p-6 rounded-lg">
         <h2 class="text-xl font-semibold mb-4 text-black">ລາຄາຄ່າປັບ (Fine Prices)</h2>
         <div class="bg-white p-4 rounded-lg">
-          <!-- Show message when no articles are selected -->
-          <div v-if="articles.length === 0" class="text-center text-gray-500 py-8">
-            <p>ບໍ່ມີມາດຕາທີ່ເລືອກ</p>
-            <p class="text-sm mt-2">(No articles selected)</p>
+          <!-- Show message when no violations are selected -->
+          <div v-if="Object.keys(selectedViolations).length === 0" class="text-center text-gray-500 py-8">
+            <p>ບໍ່ມີການລະເມີດທີ່ເລືອກ</p>
+            <p class="text-sm mt-2">(No violations selected)</p>
           </div>
           
-          <!-- Show selected articles with prices -->
+          <!-- Show selected violations with prices -->
           <div v-else class="space-y-4">
             <div class="border-b border-gray-200 pb-4">
-              <h3 class="font-semibold text-gray-700 mb-3">ລາຍການມາດຕາທີ່ເລືອກ:</h3>
-              <div class="space-y-2">
-                <div v-for="article in articles" :key="article" 
-                     class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                  <span class="text-sm text-gray-700 flex-1">{{ article }}</span>
-                  <span class="font-semibold text-blue-600 ml-4">
-                    {{ formatPrice(articlePrices[article] || 0) }}
-                  </span>
+              <h3 class="font-semibold text-gray-700 mb-3">ລາຍການການລະເມີດທີ່ເລືອກ:</h3>
+              <div class="space-y-4">
+                <div v-for="(violations, article) in selectedViolations" :key="article" 
+                     class="p-4 bg-gray-50 rounded-lg border-l-4 border-blue-500">
+                  <!-- Article Header -->
+                  <div class="flex justify-between items-start mb-3">
+                    <span class="text-sm font-medium text-gray-800 flex-1">{{ article }}</span>
+                    <span class="font-bold text-blue-600 ml-4 text-lg">
+                      {{ formatPrice((articlePrices[article] || 0) * violations.length) }}
+                    </span>
+                  </div>
+                  
+                  <!-- Selected Violations -->
+                  <div v-if="violations.length > 0" class="mt-3">
+                    <h4 class="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
+                      ການລະເມີດທີ່ເລືອກ ({{ violations.length }} ລາຍການ):
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div v-for="(violation, index) in violations" :key="index"
+                           class="flex items-center text-xs text-gray-600 bg-white px-2 py-1 rounded border">
+                        <span class="w-4 h-4 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold mr-2">
+                          ✓
+                        </span>
+                        {{ violation }}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -476,13 +671,13 @@ const generateReceipt = () => {
 
         <button 
           @click="handleAddMore"
-          :disabled="!vehicleType || articles.length === 0"
+          :disabled="!vehicleType || Object.keys(selectedViolations).length === 0"
           class="flex items-center justify-center px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
-          Add ({{ articles.length }})
+          Add ({{ Object.values(selectedViolations).flat().length }})
         </button>
       </div>
     </div>
@@ -501,6 +696,7 @@ const generateReceipt = () => {
               <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ລຳດັບ</th>
               <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ປະເພດໝວດ</th>
               <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ປະເພດມາດຕາ</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ຫົວຂໍ້</th>
               <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ວັນເດືອນປີ</th>
               <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ລາຄາ</th>
               <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ຈັດການ</th>
@@ -513,29 +709,38 @@ const generateReceipt = () => {
                 (Select violations and click "Add" button to add to summary)
               </td>
             </tr>
-            <tr v-else v-for="(article, index) in currentFinalizedArticles" :key="article" class="hover:bg-gray-50">
-              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{{ index + 1 }}</td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                {{ getViolationTypeForArticle(article) }}
-              </td>
-              <td class="px-4 py-4 text-sm text-gray-900">
-                <div class="max-w-xs truncate" :title="article">{{ article }}</div>
-              </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                {{ getCurrentDate() }}
-              </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">
-                {{ formatPrice(articlePrices[article] || 0) }}
-              </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
-                 <button @click="editArticle(article)" class="text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded mr-2">
-                   ແກ້ໄຂ
-                 </button>
-                 <button @click="removeArticle(article)" class="text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded">
-                   ລຶບ
-                  </button>
-              </td>
-            </tr>
+            <template v-else>
+              <template v-for="(violations, article) in currentFinalizedViolations" :key="article">
+                <tr v-for="(violation, violationIndex) in violations" :key="`${article}-${violation}`" class="hover:bg-gray-50">
+                  <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{{ violationIndex + 1 }}</td>
+                  <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {{ getViolationTypeForArticle(String(article)) }}
+                  </td>
+                  <td class="px-4 py-4 text-sm text-gray-900">
+                    <div class="max-w-xs">
+                      <div class="font-semibold truncate" :title="String(article)">{{ article }}</div>
+                    </div>
+                  </td>
+                  <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {{ violation }}
+                  </td>
+                  <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {{ getCurrentDate() }}
+                  </td>
+                  <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">
+                    {{ formatPrice(articlePrices[String(article)] || 0) }}
+                  </td>
+                  <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                     <button @click="editViolation(String(article), violation)" class="text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded mr-2">
+                       ແກ້ໄຂ
+                     </button>
+                     <button @click="removeViolation(String(article), violation)" class="text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded">
+                       ລຶບ
+                      </button>
+                  </td>
+                </tr>
+              </template>
+            </template>
           </tbody>
         </table>
       </div>
@@ -548,7 +753,7 @@ const generateReceipt = () => {
         <div class="space-y-4">
           <div class="flex justify-between items-center">
             <span class="text-black">ຈຳນວນຂໍ້ຫາ:</span>
-            <span class="text-black font-semibold">{{ currentFinalizedArticles.length }} ລາຍການ</span>
+            <span class="text-black font-semibold">{{ Object.values(currentFinalizedViolations).flat().length }} ລາຍການ</span>
           </div>
           
           <div class="flex justify-between items-center">

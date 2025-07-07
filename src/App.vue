@@ -15,11 +15,11 @@ import LoginandRegister from './views/LoginandRegister.vue';
   <div class="bg-white">
     <!-- <Payment/> -->
     <!-- <Licence_card/>  -->
-    <!-- <P_mainView /> -->
+    <P_mainView />
     <!-- <Licence_card/> -->
     <!-- <MainView /> -->
     <!-- <Confirm/> -->
-    <LoginandRegister />
+    <!-- <LoginandRegister /> -->
   </div>
 </template>
 
