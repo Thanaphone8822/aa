@@ -344,6 +344,8 @@ const olderCount = computed(() => {
                   <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">ລຳດັບ</th>
                   <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">ປະເພດໝວດ</th>
                   <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">ປະເພດມາດຕາ</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ຫົວຂໍ້</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ວັນເດືອນປີ</th>
                   <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">ລາຄາ</th>
                 </tr>
               </thead>
@@ -360,6 +362,12 @@ const olderCount = computed(() => {
                   </td>
                   <td class="px-4 py-4 text-sm text-gray-900">
                     <div class="max-w-xs truncate" :title="article.name">{{ article.name }}</div>
+                  </td>
+                  <td class="px-4 py-4 text-sm text-gray-900">
+
+                  </td>
+                  <td class="px-4 py-4 text-sm text-gray-900">
+                    28/6/2025
                   </td>
                   <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">
                     {{ formatPrice(article.price || 0) }}
