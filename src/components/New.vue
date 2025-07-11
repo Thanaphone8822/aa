@@ -2,11 +2,13 @@
 
 </script>
 <template>
-    <div class="flex gap-4 items-center pt-3 h-230">
-        <div class="flex bg-amber-50 p-4 text-9xl h-full w-300 rounded-2xl text-gray-700 items-center justify-center">ຂ່າວສານ1</div>
-        <div class="flex bg-amber-50 p-4 text-9xl h-full w-full rounded-2xl text-gray-700 items-center justify-center">ຂ່າວສານ2</div>
+    <div class="flex flex-col items-center pt-8">
+        <div class="w-[300px] h-[300px] flex items-center justify-center mb-2">
+            <img class="w-full h-full object-cover" src="@/assets/POLICE.png" alt="Police Logo" />
+        </div>
+        <a class="text-black font-bold text-3xl font-lao">ກົມຕໍາຫຼວດຈາລະຈອນ</a>
+        <a class="text-black font-bold text-2xl font-lao mt-2">ຍິນດີຕ້ອນຮັບເຂົ້າສູ່ລະບົບສຳຫຼັບຜູ້ລະເມີດ</a>
     </div>
 </template>
-
 
 <style scoped></style>

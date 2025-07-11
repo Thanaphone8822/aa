@@ -1,16 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import LoginView from '@/components/LoginView.vue'
 import AdminView from '../views/AdminView.vue'
-import UserView from '../views/UserView.vue'
-import PoliceVeiw from '../views/PoliceVeiw.vue'
 import P_mainView from '../views/P_mainView.vue'
 import Licence_card from '@/components/Licence_card.vue'
 import Payment from '@/components/Payment.vue'
 import Table from '@/components/Table.vue'
-import p_login from '@/components/p_login.vue'
 import Ruledt from '@/components/RulesDt.vue';
 import History from '@/components/History.vue';
 import p_card from '@/components/P_card.vue';
+import Report from '@/components/Report.vue';
+import Finceincome from '@/components/Fineincome.vue';
+import Police_home from '@/components/Police_home.vue';
+import FinesPage from '@/components/FinesPage.vue';
+import Rules from '@/components/Rules.vue';
+import ReportFines from '@/components/ReportFines.vue'
+import LoginandRegister from '@/components/LoginandRegister.vue'
 
 
 const router = createRouter({
@@ -20,17 +23,18 @@ const router = createRouter({
       path: '/admin',
       component: AdminView,
       meta: { requiresRole: 'admin' },
+      children: [
+        {
+          path: 'ad_rules',
+          name: 'ad_rules',
+          component: () => import('../components/ad_rules.vue'),
+        },
+      ]
     },
     {
-      path: '/user',
-      component: UserView,
-      meta: { requiresRole: 'user' },
-    },
-    {
-      path: '/police',
-      name: 'police',
-      component: PoliceVeiw,
-      meta: { requiresRole: 'police' },
+      path: '/login',
+      name: 'MainLogin',
+      component: LoginandRegister,
     },
     {
       path: '/',
@@ -39,7 +43,7 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: LoginView,
+      component: LoginandRegister,
     },
     {
       path: '/main',
@@ -66,9 +70,19 @@ const router = createRouter({
           name: 'license',
           component: () => import('../components/Licence_card.vue'),
         },
+        {
+          path: 'Finceincome',
+          name: 'Finceincome',
+          component: Finceincome,
+        },
 
         // Add more as needed
       ]
+    },
+    {
+      path: '/report',
+      name: 'report',
+      component: Report,
     },
     {
       path: '/rules',
@@ -80,6 +94,26 @@ const router = createRouter({
       name: 'pmain',
       component: P_mainView,
       children: [
+        {
+          path: 'main', // <-- FIXED: was 'pmain'
+          name: 'pmain-main',
+          component: Police_home,
+        },
+        {
+          path: 'fines',
+          name: 'pmain-fines',
+          component: FinesPage,
+        },
+        {
+          path: 'rules',
+          name: 'pmain-rules',
+          component: Rules,
+        },
+        {
+          path: 'report',
+          name: 'pmain-report',
+          component: ReportFines,
+        },
         {
           path: 'card',
           name: 'card',
@@ -98,7 +132,7 @@ const router = createRouter({
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import('../views/RegisterView.vue'),
+      component: () => import('../components/RegisterView.vue'),
     },
     {
       path: '/confirm',
@@ -119,7 +153,22 @@ const router = createRouter({
     {
       path: '/plogin',
       name: 'plogin',
-      component: () => import('@/components/P_login.vue'),
+      component: () => import('@/components/p_login.vue'),
+    },
+    {
+      path: '/police-register',
+      name: 'police-register',
+      component: () => import('@/components/P_register.vue'),
+    },
+    {
+      path: '/offender-login',
+      name: 'offender-login',
+      component: () => import('../components/OffenderLogin.vue'),
+    },
+    {
+      path: '/police-login',
+      name: 'police-login',
+      component: () => import('../components/PoliceLogin.vue'),
     },
 
   ],

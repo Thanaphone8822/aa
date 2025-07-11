@@ -25,7 +25,6 @@ onMounted(async () => {
     } catch (error) {
         errorMessage.value = error.message; // Handle errors
     }
-    
 });
 </script>
 
@@ -33,42 +32,42 @@ onMounted(async () => {
     <div class="overflow-x-auto rounded mt-[2px]">
         <!-- Conditionally Render Components -->
         <div v-if="activeComponent === 'rule'">
-            <table class="table table-xs table-pin-rows table-pin-cols text-base">
+            <table class="min-w-full table-auto border-collapse rounded-lg shadow-lg overflow-hidden">
                 <thead>
-                    <tr>
-                        <th>ລຳດັບ</th>
-                        <td class="text-lg">ຊື່</td>
-                        <td class="text-lg">ນາມສະກຸນ</td>
-                        <td class="text-lg">ປ້າຍລົດ</td>
-                        <td class="text-lg">ເວລາ</td>
-                        <td class="text-lg">ສະຖານທີ່</td>
-                        <!-- <td class="text-lg">ເລກຖັງ</td> -->
-                        <!-- <td class="text-lg">ປະເພດລົດ</td> -->
+                    <tr class="bg-sky-800 text-white">
+                        <th class="py-3 px-4 text-lg font-semibold">ລຳດັບ</th>
+                        <th class="py-3 px-4 text-lg font-semibold">ຊື່</th>
+                        <th class="py-3 px-4 text-lg font-semibold">ນາມສະກຸນ</th>
+                        <th class="py-3 px-4 text-lg font-semibold">ປ້າຍລົດ</th>
+                        <th class="py-3 px-4 text-lg font-semibold">ເວລາ</th>
+                        <th class="py-3 px-4 text-lg font-semibold">ສະຖານທີ່</th>
+                        <!-- <th class="py-3 px-4 text-lg font-semibold">ເລກຖັງ</th> -->
+                        <!-- <th class="py-3 px-4 text-lg font-semibold">ປະເພດລົດ</th> -->
                     </tr>
                 </thead>
                 <tbody>
                     <!-- Loop through products and render rows dynamically -->
                     <tr v-for="(product, index) in products" :key="product.id" @click="handleRowClick('payment')"
-                        class="hover:bg-base-200 transition-colors duration-200 hover:rounded-lg cursor-pointer">
-                        <th class="text-sm">{{ index + 1 }}</th>
-                        <td class="text-base">{{ product.id }}</td>
-                        <td class="text-base">{{ product.rule_type}}</td>
-                        <td class="text-base">{{ product.address }}</td>
-                        <td class="text-base">{{ product.brith }}</td>
-                        <td class="text-base">{{ product.create_at }}</td>
-                        <!-- <td class="text-base">{{ product.machine__number}}</td> -->
+                        class="cursor-pointer hover:bg-sky-100 border-b border-gray-200 transition-all">
+                        <td class="py-2 px-4 text-base text-center">{{ index + 1 }}</td>
+                        <td class="py-2 px-4 text-base">{{ product.id }}</td>
+                        <td class="py-2 px-4 text-base">{{ product.rule_type}}</td>
+                        <td class="py-2 px-4 text-base">{{ product.address }}</td>
+                        <td class="py-2 px-4 text-base">{{ product.brith }}</td>
+                        <td class="py-2 px-4 text-base">{{ product.create_at }}</td>
+                        <!-- <td class="py-2 px-4 text-base">{{ product.machine__number}}</td> -->
                     </tr>
                 </tbody>
                 <tfoot>
-                    <tr>
-                        <th>ລຳດັບ</th>
-                        <td class="text-lg">ຊື່</td>
-                        <td class="text-lg">ນາມສະກຸນ</td>
-                        <td class="text-lg">ປ້າຍລົດ</td>
-                        <td class="text-lg">ເວລາ</td>
-                        <td class="text-lg">ສະຖານທີ່</td>
-                        <!-- <td class="text-lg">ເລກຖັງ</td> -->
-                        <!-- <td class="text-lg">ປະເພດລົດ</td> -->
+                    <tr class="bg-gray-100">
+                        <th class="py-2 px-4 text-lg">ລຳດັບ</th>
+                        <th class="py-2 px-4 text-lg">ຊື່</th>
+                        <th class="py-2 px-4 text-lg">ນາມສະກຸນ</th>
+                        <th class="py-2 px-4 text-lg">ປ້າຍລົດ</th>
+                        <th class="py-2 px-4 text-lg">ເວລາ</th>
+                        <th class="py-2 px-4 text-lg">ສະຖານທີ່</th>
+                        <!-- <th class="py-2 px-4 text-lg">ເລກຖັງ</th> -->
+                        <!-- <th class="py-2 px-4 text-lg">ປະເພດລົດ</th> -->
                     </tr>
                 </tfoot>
             </table>

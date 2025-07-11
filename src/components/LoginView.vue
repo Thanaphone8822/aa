@@ -11,29 +11,38 @@ const errorMessage = ref('')
 const loading = ref(false)
 const userName = ref('')
 
+const API_BASE = 'http://localhost:3000/api';
+
 const handleLogin = async () => {
   loading.value = true
   errorMessage.value = ''
   try {
-    const response = await fetch('http://localhost:3000/api/login', {
+    const response = await fetch(`${API_BASE}/login`, {
       credentials: 'include',
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         NV: NV.value.trim(),
         KS: KS.value.trim(),
-        password: MD5(password.value.trim()).toString(),
+        password: password.value.trim(),
       }),
     })
 
-    const data = await response.json()
+    // Try to parse JSON, but handle non-JSON errors
+    let data
+    try {
+      data = await response.json()
+    } catch (e) {
+      const text = await response.text()
+      throw new Error(text || 'Invalid server response')
+    }
 
     if (!response.ok || data.success === false) {
       throw new Error(data.message || 'Invalid credentials')
     }
 
     // Now fetch the user's profile
-    const profileRes = await fetch('http://localhost:3000/api/user/profile', { credentials: 'include' })
+    const profileRes = await fetch(`${API_BASE}/user/profile`, { credentials: 'include' })
     const profileData = await profileRes.json()
     if (profileData.code === 10 && profileData.data) {
       userName.value = profileData.data.name || profileData.data.username
@@ -49,8 +58,13 @@ const handleLogin = async () => {
 
 // Check cookie/session on mount
 onMounted(async () => {
-  const res = await fetch('http://localhost:3000/api/user', { credentials: 'include' });
-  const data = await res.json();
+  const res = await fetch(`${API_BASE}/user`, { credentials: 'include' });
+  let data
+  try {
+    data = await res.json();
+  } catch (e) {
+    data = {};
+  }
   if (data.code === 10) {
     router.push({ name: 'main' });
   }

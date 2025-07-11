@@ -1,44 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-// import Payment from './Payment.vue';
+import { defineProps, computed } from 'vue'
 
-// Reactive variable to track the active component
-const activeComponent = ref('rule'); // Default to 'table'
+// Accept a single card object as a prop
+const props = defineProps({ card: Object })
 
-// Function to handle row click
-const handleRowClick = (component: any) => {
-    activeComponent.value = component; // Set the active component
-};
-
-const products: any = ref([]); // Store the list of products from the backend
-const errorMessage = ref(''); // Store any error messages
-
-onMounted(async () => {
-    try {
-        // Call the backend API for the current user's licence card, including credentials (cookies)
-        const response = await fetch('http://localhost:3000/api/card/my', {
-            credentials: 'include'
-        });
-        if (!response.ok) {
-            // Try to extract error message from backend
-            let msg = 'Failed to fetch data from backend';
-            try {
-                const errData = await response.json();
-                msg = errData.message || msg;
-            } catch { }
-            throw new Error(msg);
-        }
-        const data = await response.json();
-        // The API returns a single object in data, so wrap it in an array for template compatibility
-        products.value = data.data ? [data.data] : [];
-    } catch (error: any) {
-        errorMessage.value = error.message; // Handle errors
-    }
-});
-
+// For template compatibility, wrap card in an array if it exists
+const products = computed(() => props.card ? [props.card] : [])
 </script>
-
-
 <template>
     <div class="flex flex-col items-center justify-center min-h-screen">
         <div
@@ -50,17 +18,17 @@ onMounted(async () => {
             </div>
 
             <!-- Title Section -->
-            <div v-for="(product, index) in products" class="text-left mt-2 mb-4">
+            <div v-for="(product, index) in products" class="text-left mt-2 mb-4" :key="index">
                 <p class="font-bold text-blue-700">ໃບຂັບຂີ່ຍານພາຫະນະ</p>
                 <p class="text-[11px] text-blue-700">PERMIS DE CONDUIRE</p>
                 <p class="text-[11px] text-green-700">DRIVING LICENCE</p>
                 <div class="absolute top-12 right-4 text-[10px] text-red-600">
-                    ນວ {{ product.KS }}<br />ຂສ {{ product.NV }}
+                    ນວ {{ product.KS || product.ks }}<br />ຂສ {{ product.NV || product.nv }}
                 </div>
             </div>
 
             <!-- Content Section -->
-            <div v-for="(product, index) in products" class="flex items-center gap-2">
+            <div v-for="(product, index) in products" class="flex items-center gap-2" :key="'content-' + index">
                 <div class="w-16 h-20 bg-gray-300 rounded overflow-hidden">
                     <img src="@/assets/11.jpg" alt="">
                 </div>
@@ -73,7 +41,8 @@ onMounted(async () => {
             </div>
 
             <!-- Footer Section -->
-            <div v-for="(product, index) in products" class="absolute bottom-2 left-4 text-[10px] text-black space-y-1">
+            <div v-for="(product, index) in products" class="absolute bottom-2 left-4 text-[10px] text-black space-y-1"
+                :key="'footer-' + index">
                 <p>ອອກວັນທີ / Delivre / Issued: {{ product.DI }}</p>
                 <p>ວັນໝົດອາຍ / Expiration / Expiry: {{ product.DE }}</p>
                 <p>ປະເພດ / Categorie / Category: {{ product.c_category }}</p>
@@ -90,9 +59,7 @@ onMounted(async () => {
         </div>
 
     </div>
-
 </template>
-
 
 
 <style scoped></style>
