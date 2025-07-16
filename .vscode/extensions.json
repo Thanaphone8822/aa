@@ -1,6 +1,17 @@
 {
   "recommendations": [
     "Vue.volar",
-    "vitest.explorer"
+    "vitest.explorer",
+    "GitHub.copilot",
+    "GitHub.copilot-chat",
+    "TabNine.tabnine-vscode",
+    "ms-vscode.vscode-typescript-next",
+    "bradlc.vscode-tailwindcss",
+    "esbenp.prettier-vscode",
+    "ms-vscode.vscode-eslint",
+    "formulahendry.auto-rename-tag",
+    "ms-vscode.vscode-json",
+    "ms-vscode.vscode-markdown",
+    "usernamehw.errorlens"
   ]
 }
